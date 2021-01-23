@@ -1,0 +1,137 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using SocialSite.Areas.Identity.Data;
+
+namespace SocialSite.Areas.Identity.Pages.Account.Manage
+{
+    public partial class IndexModel : PageModel
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+
+        public IndexModel(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+        }
+
+        [Display(Name = "Nazwa użytkownika")]
+        public string Username { get; set; }
+
+        [TempData]
+        public string StatusMessage { get; set; }
+
+        [BindProperty]
+        public InputModel Input { get; set; }
+
+        public class InputModel
+        {
+            [Phone]
+            [Display(Name = "Numer telefonu")]
+            public string PhoneNumber { get; set; }
+
+            [Required(ErrorMessage = "Imię nie może być puste.")]
+            [StringLength(100, ErrorMessage = "Imię musi zawierać minimum {2} i maksymalnie {1} znaków.", MinimumLength = 3)]
+            [DataType(DataType.Text)]
+            [Display(Name = "Imię")]
+            public string FirstName { get; set; }
+
+            [Required(ErrorMessage = "Nazwisko nie może być puste.")]
+            [StringLength(100, ErrorMessage = "Nazwisko musi zawierać minimum {2} i maksymalnie {1} znaków.", MinimumLength = 3)]
+            [DataType(DataType.Text)]
+            [Display(Name = "Nazwisko")]
+            public string LastName { get; set; }
+
+            [Required(ErrorMessage = "Data urodzin nie może być pusta.")]
+            [DataType(DataType.Date)]
+            [Display(Name = "Data urodzin")]
+            public DateTime DayOfBirth { get; set; }
+        }
+
+        private async Task LoadAsync(ApplicationUser user)
+        {
+            var userName = await _userManager.GetUserNameAsync(user);
+            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            var dayOfBirth = user.DayOfBirth;
+            var firstName = user.FirstName;
+            var lastName = user.LastName;
+
+            Username = userName;
+
+            Input = new InputModel
+            {
+                PhoneNumber = phoneNumber,
+                FirstName = firstName,
+                LastName = lastName,
+                DayOfBirth = dayOfBirth
+            };
+        }
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            await LoadAsync(user);
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadAsync(user);
+                return Page();
+            }
+
+            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            if (Input.PhoneNumber != phoneNumber)
+            {
+                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+                if (!setPhoneResult.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to set phone number.";
+                    return RedirectToPage();
+                }
+            }
+
+            if (Input.FirstName != user.FirstName)
+            {
+                user.FirstName = Input.FirstName;
+            }
+
+            if (Input.LastName != user.LastName)
+            {
+                user.LastName = Input.LastName;
+            }
+
+            if (Input.DayOfBirth != user.DayOfBirth)
+            {
+                user.DayOfBirth = Input.DayOfBirth;
+            }
+
+            await _userManager.UpdateAsync(user);
+            await _signInManager.RefreshSignInAsync(user);
+
+            StatusMessage = "Twój profil został zaktualizowany";
+            return RedirectToPage();
+        }
+    }
+}
