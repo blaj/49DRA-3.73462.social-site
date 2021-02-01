@@ -1,4 +1,6 @@
-﻿using SocialSite.Dto.Post;
+﻿using SocialSite.Areas.Identity.Data;
+using SocialSite.Dto.Comment;
+using SocialSite.Dto.Post;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +12,7 @@ namespace SocialSite.Dto.Home
     {
         public PostCreateRequest PostCreateRequest { get; set; }
         public List<Models.Post> Posts { get; set; }
+        public ApplicationUser ApplicationUser { get; set;  }
+        public CommentCreateRequest CommentCreateRequest { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace SocialSite.Repository
 {
@@ -37,7 +38,7 @@ namespace SocialSite.Repository
 
         public IEnumerable<Post> FindAll()
         {
-            return _dbContext.Posts.OrderByDescending(p => p.CreatedOn).ToList();
+            return _dbContext.Posts.Include(p => p.ApplicationUser).Include(p => p.Comments).OrderByDescending(p => p.CreatedOn).ToList();
         }
 
         public bool IsPostExistsById()
