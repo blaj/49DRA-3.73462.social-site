@@ -6,9 +6,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SocialSite.Areas.Identity.Data;
+using SocialSite.Data;
+using SocialSite.Repository;
+using SocialSite.Service;
 
 namespace SocialSite
 {
@@ -27,6 +32,13 @@ namespace SocialSite
             services.AddControllersWithViews();
             services.AddRazorPages();
 
+            services.AddDbContext<AuthDbContext>(options =>
+                options.UseMySql(
+                    Configuration.GetConnectionString("AuthDbContextConnection")));
+
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddEntityFrameworkStores<AuthDbContext>();
+
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings
@@ -38,6 +50,9 @@ namespace SocialSite
                 // User settings
                 options.User.RequireUniqueEmail = true;
             });
+
+            services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IPostRepository, PostRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

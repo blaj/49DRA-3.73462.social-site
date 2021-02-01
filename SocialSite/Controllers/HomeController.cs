@@ -5,7 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SocialSite.Data;
+using SocialSite.Dto.Home;
 using SocialSite.Models;
 
 namespace SocialSite.Controllers
@@ -13,16 +16,19 @@ namespace SocialSite.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly AuthDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(AuthDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var posts = await _context.Posts.Include(p => p.ApplicationUser).OrderByDescending(p => p.CreatedOn).ToListAsync();
+            var indexViewModel = new IndexViewModel { Posts = posts, PostCreateRequest = new Dto.Post.PostCreateRequest() };
+
+            return View(indexViewModel);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

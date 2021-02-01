@@ -5,8 +5,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20210123171948_CreatePost.cs" />
+    <Compile Remove="Migrations\20210123171948_CreatePost.Designer.cs" />
+    <Compile Remove="Migrations\20210123172041_CreatePost.cs" />
+    <Compile Remove="Migrations\20210123172041_CreatePost.Designer.cs" />
+    <Compile Remove="Migrations\20210124232304_PostOneToOneChanges.cs" />
+    <Compile Remove="Migrations\20210124232304_PostOneToOneChanges.Designer.cs" />
+    <Compile Remove="Migrations\PostDb\20210123171732_CreatePost.cs" />
+    <Compile Remove="Migrations\PostDb\20210123171732_CreatePost.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.11">
       <PrivateAssets>all</PrivateAssets>
@@ -15,6 +28,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
     <PackageReference Include="MySqlConnector" Version="0.69.10" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\PostDb\" />
   </ItemGroup>
 
 </Project>
