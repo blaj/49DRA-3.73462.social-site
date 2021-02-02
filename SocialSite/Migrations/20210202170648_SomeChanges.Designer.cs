@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialSite.Data;
 
 namespace SocialSite.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210202170648_SomeChanges")]
+    partial class SomeChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,6 +159,9 @@ namespace SocialSite.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
@@ -212,6 +217,8 @@ namespace SocialSite.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApplicationUserId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
 
@@ -220,21 +227,6 @@ namespace SocialSite.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("SocialSite.Models.ApplicationUserFriend", b =>
-                {
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                    b.Property<string>("FriendId")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                    b.HasKey("ApplicationUserId", "FriendId");
-
-                    b.HasIndex("FriendId");
-
-                    b.ToTable("ApplicationUserFriend");
                 });
 
             modelBuilder.Entity("SocialSite.Models.Comment", b =>
@@ -252,7 +244,7 @@ namespace SocialSite.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("PostId")
+                    b.Property<int?>("PostId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -340,19 +332,11 @@ namespace SocialSite.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SocialSite.Models.ApplicationUserFriend", b =>
+            modelBuilder.Entity("SocialSite.Areas.Identity.Data.ApplicationUser", b =>
                 {
-                    b.HasOne("SocialSite.Areas.Identity.Data.ApplicationUser", "ApplicationUser")
+                    b.HasOne("SocialSite.Areas.Identity.Data.ApplicationUser", null)
                         .WithMany("Friends")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SocialSite.Areas.Identity.Data.ApplicationUser", "Friend")
-                        .WithMany("FriendOf")
-                        .HasForeignKey("FriendId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ApplicationUserId");
                 });
 
             modelBuilder.Entity("SocialSite.Models.Comment", b =>
@@ -363,9 +347,7 @@ namespace SocialSite.Migrations
 
                     b.HasOne("SocialSite.Models.Post", "Post")
                         .WithMany("Comments")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PostId");
                 });
 
             modelBuilder.Entity("SocialSite.Models.Post", b =>

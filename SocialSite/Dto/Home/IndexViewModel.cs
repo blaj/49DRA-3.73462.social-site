@@ -12,6 +12,7 @@ namespace SocialSite.Dto.Home
     {
         public PostCreateRequest PostCreateRequest { get; set; }
         public List<Models.Post> Posts { get; set; }
+        public List<Models.Comment> Comments { get; set; }
         public ApplicationUser ApplicationUser { get; set;  }
         public CommentCreateRequest CommentCreateRequest { get; set; }
     }

@@ -13,15 +13,13 @@ namespace SocialSite.Models
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
         public string Title { get; set; }
-
         public string Content { get; set; }
-        
         public DateTime CreatedOn { get; set; }
 
-        public virtual ApplicationUser ApplicationUser { get; set; }
+        public string ApplicationUserId { get; set; }
 
+        public virtual ApplicationUser ApplicationUser { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
     }
 }

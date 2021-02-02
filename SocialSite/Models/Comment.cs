@@ -16,6 +16,9 @@ namespace SocialSite.Models
         public string Content { get; set; }
         public DateTime CreatedOn { get; set; }
 
+        public int PostId { get; set; }
+        public string ApplicationUserId { get; set; }
+
         public virtual Post Post { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
     }

@@ -17,19 +17,39 @@ namespace SocialSite.Data
         {
         }
 
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Post>(EntityFrameworkQueryableExtensions =>
-            {
+            builder.Entity<Post>()
+                .HasOne<ApplicationUser>(p => p.ApplicationUser)
+                .WithMany(p => p.Posts)
+                .HasForeignKey(p => p.ApplicationUserId);
 
+            builder.Entity<Comment>(b =>
+            {
+                b.HasOne<ApplicationUser>(c => c.ApplicationUser)
+                    .WithMany(c => c.Comments)
+                    .HasForeignKey(c => c.ApplicationUserId);
+
+                b.HasOne<Post>(c => c.Post)
+                    .WithMany(c => c.Comments)
+                    .HasForeignKey(c => c.PostId);
             });
 
-            builder.Entity<Comment>(EntityFrameworkQueryableExtensions =>
+            builder.Entity<ApplicationUserFriend>(b => 
             {
+                b.HasKey(u => new { u.ApplicationUserId, u.FriendId });
 
+                b.HasOne(u => u.ApplicationUser)
+                    .WithMany(u => u.Friends)
+                    .HasForeignKey(u => u.ApplicationUserId);
+
+                b.HasOne(u => u.Friend)
+                    .WithMany(u => u.FriendOf)
+                    .HasForeignKey(u => u.FriendId);
             });
 
             base.OnModelCreating(builder);

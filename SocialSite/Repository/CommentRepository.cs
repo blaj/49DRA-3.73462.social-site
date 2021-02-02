@@ -1,4 +1,5 @@
-﻿using SocialSite.Data;
+﻿using SocialSite.Areas.Identity.Data;
+using SocialSite.Data;
 using SocialSite.Models;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,11 @@ namespace SocialSite.Repository
             }
         }
 
+        public ICollection<Comment> FindAllByUser(ApplicationUser user)
+        {
+            return _dbContext.Comments.Where(c => c.ApplicationUser == user).ToList();
+        }
+
         public Comment FindOneById(int? id)
         {
             return _dbContext.Comments.Where(p => p.Id == id).FirstOrDefault();
@@ -54,5 +60,6 @@ namespace SocialSite.Repository
         bool Create(Comment entity);
         bool Delete(Comment entity);
         Comment FindOneById(int? id);
+        ICollection<Comment> FindAllByUser(ApplicationUser user);
     }
 }

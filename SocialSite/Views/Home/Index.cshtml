@@ -8,16 +8,24 @@
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
-                <div class="h5">@Model.ApplicationUser.FirstName @Model.ApplicationUser.LastName</div>
+                <div class="h5">
+                    <a asp-controller="User" asp-action="Details" asp-route-id="@Model.ApplicationUser.Id">
+                        @Model.ApplicationUser.FirstName @Model.ApplicationUser.LastName
+                    </a>
+                </div>
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <div class="h6 text-muted">Znajomych</div>
-                    <div class="h5">5.2342</div>
+                    <div class="h5">@(Model.ApplicationUser.Friends.Count + Model.ApplicationUser.FriendOf.Count)</div>
                 </li>
                 <li class="list-group-item">
                     <div class="h6 text-muted">Postów</div>
-                    <div class="h5">6758</div>
+                    <div class="h5">@Model.ApplicationUser.Posts.Count</div>
+                </li>
+                <li class="list-group-item">
+                    <div class="h6 text-muted">Komentarzy</div>
+                    <div class="h5">@Model.Comments.Count</div>
                 </li>
             </ul>
         </div>
@@ -68,22 +76,30 @@
                                 <img class="rounded-circle" width="45" src="https://picsum.photos/50/50" alt="">
                             </div>
                             <div class="ml-2">
-                                <div class="h5 m-0">@post.ApplicationUser.FirstName @post.ApplicationUser.LastName</div>
+                                <div class="h5 m-0">
+                                    <a asp-controller="User" asp-action="Details" asp-route-id="@post.ApplicationUser.Id">
+                                        @post.ApplicationUser.FirstName @post.ApplicationUser.LastName
+                                    </a>
+                                </div>
                                 <div class="h7 text-muted">@post.CreatedOn</div>
                             </div>
                         </div>
-                        <div>
-                            <div class="dropdown">
-                                <button class="btn btn-link dropdown-toggle" type="button" id="gedf-drop1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-ellipsis-h"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop1">
-                                    <div class="h6 dropdown-header">Co chcesz zrobić?</div>
-                                    <a class="dropdown-item" asp-controller="Post" asp-action="Edit" asp-route-id="@post.Id">Edytuj</a>
-                                    <a class="dropdown-item" asp-controller="Post" asp-action="Delete" asp-route-id="@post.Id">Usuń</a>
+
+                        @if (post.ApplicationUser.UserName == User.Identity.Name)
+                        {
+                            <div>
+                                <div class="dropdown">
+                                    <button class="btn btn-link dropdown-toggle" type="button" id="gedf-drop1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-ellipsis-h"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop1">
+                                        <div class="h6 dropdown-header">Co chcesz zrobić?</div>
+                                        <a class="dropdown-item" asp-controller="Post" asp-action="Edit" asp-route-id="@post.Id">Edytuj</a>
+                                        <a class="dropdown-item" asp-controller="Post" asp-action="Delete" asp-route-id="@post.Id">Usuń</a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
 
                 </div>
@@ -109,7 +125,16 @@
                             </div>
                             <div class="col">
                                 <div class="card-block">
-                                    <h4 class="h5">@comment.ApplicationUser.FirstName @comment.ApplicationUser.LastName - <a class="h6" asp-controller="Comment" asp-action="Delete" asp-route-id="@comment.Id">Usuń</a></h4>
+                                    <h4 class="h5">
+                                        @comment.ApplicationUser.FirstName @comment.ApplicationUser.LastName
+
+                                        @if (comment.ApplicationUser.UserName == User.Identity.Name)
+                                        {
+                                            <a class="h6" asp-controller="Comment" asp-action="Delete" asp-route-id="@comment.Id">
+                                                Usuń
+                                            </a>
+                                        }
+                                    </h4>
                                     <p class="">@comment.Content</p>
                                 </div>
                             </div>

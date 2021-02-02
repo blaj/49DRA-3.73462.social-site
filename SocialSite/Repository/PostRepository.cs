@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SocialSite.Areas.Identity.Data;
 
 namespace SocialSite.Repository
 {
@@ -73,6 +74,11 @@ namespace SocialSite.Repository
                 return false;
             }
         }
+
+        public IEnumerable<Post> FindAllByUser(ApplicationUser user)
+        {
+            return _dbContext.Posts.Include(p => p.ApplicationUser).Include(p => p.Comments).ThenInclude(c => c.ApplicationUser).Where(p => p.ApplicationUser == user).OrderByDescending(p => p.CreatedOn).ToList();
+        }
     }
 
     public interface IPostRepository
@@ -83,5 +89,6 @@ namespace SocialSite.Repository
         bool Delete(Post entity);
         bool IsPostExistsById();
         IEnumerable<Post> FindAll();
+        IEnumerable<Post> FindAllByUser(ApplicationUser user);
     }
 }

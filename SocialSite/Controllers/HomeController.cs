@@ -13,6 +13,7 @@ using SocialSite.Data;
 using SocialSite.Dto.Home;
 using SocialSite.Models;
 using SocialSite.Repository;
+using SocialSite.Service;
 
 namespace SocialSite.Controllers
 {
@@ -22,20 +23,26 @@ namespace SocialSite.Controllers
         private readonly AuthDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPostRepository _postRepository;
+        private readonly ICommentRepository _commentRepository;
+        private readonly IUserService _userService;
 
-        public HomeController(AuthDbContext context, UserManager<ApplicationUser> userManager, IPostRepository postRepository)
+        public HomeController(AuthDbContext context, UserManager<ApplicationUser> userManager, IPostRepository postRepository, ICommentRepository commentRepository, IUserService userService)
         {
             _context = context;
             _userManager = userManager;
             _postRepository = postRepository;
+            _commentRepository = commentRepository;
+            _userService = userService;
         }
 
         public async Task<IActionResult> Index()
         {
             var posts = _postRepository.FindAll().ToList();
-            var user = await _userManager.GetUserAsync(User);
+            var userFromPrincipal = await _userManager.GetUserAsync(User);
+            var user = _context.ApplicationUsers.Where(u => u.Id == userFromPrincipal.Id).Include(u => u.Friends).Include(u => u.FriendOf).FirstOrDefault();
+            var comments = _commentRepository.FindAllByUser(user).ToList();
 
-            var indexViewModel = new IndexViewModel { Posts = posts, PostCreateRequest = new Dto.Post.PostCreateRequest(), ApplicationUser = user };
+            var indexViewModel = new IndexViewModel { Posts = posts, Comments = comments, PostCreateRequest = new Dto.Post.PostCreateRequest(), ApplicationUser = user };
 
             return View(indexViewModel);
         }
