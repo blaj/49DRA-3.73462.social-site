@@ -18,7 +18,7 @@ using SocialSite.Service;
 namespace SocialSite.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController : AbstractController
     {
         private readonly AuthDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -26,7 +26,8 @@ namespace SocialSite.Controllers
         private readonly ICommentRepository _commentRepository;
         private readonly IUserService _userService;
 
-        public HomeController(AuthDbContext context, UserManager<ApplicationUser> userManager, IPostRepository postRepository, ICommentRepository commentRepository, IUserService userService)
+        public HomeController(AuthDbContext context, UserManager<ApplicationUser> userManager, 
+            IPostRepository postRepository, ICommentRepository commentRepository, IUserService userService) : base(context)
         {
             _context = context;
             _userManager = userManager;
@@ -42,7 +43,9 @@ namespace SocialSite.Controllers
             var user = _context.ApplicationUsers.Where(u => u.Id == userFromPrincipal.Id).Include(u => u.Friends).Include(u => u.FriendOf).FirstOrDefault();
             var comments = _commentRepository.FindAllByUser(user).ToList();
 
-            var indexViewModel = new IndexViewModel { Posts = posts, Comments = comments, PostCreateRequest = new Dto.Post.PostCreateRequest(), ApplicationUser = user };
+            var activeFriends = _userService.GetActiveFriends(user).ToList();
+
+            var indexViewModel = new IndexViewModel { Posts = posts, Comments = comments, PostCreateRequest = new Dto.Post.PostCreateRequest(), ApplicationUser = user, ActiveFriends = activeFriends };
 
             return View(indexViewModel);
         }

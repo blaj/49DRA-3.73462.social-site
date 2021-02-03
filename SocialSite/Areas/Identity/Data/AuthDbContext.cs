@@ -20,6 +20,7 @@ namespace SocialSite.Data
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -50,6 +51,17 @@ namespace SocialSite.Data
                 b.HasOne(u => u.Friend)
                     .WithMany(u => u.FriendOf)
                     .HasForeignKey(u => u.FriendId);
+            });
+
+            builder.Entity<Message>(b => 
+            {
+                b.HasOne(m => m.Sender)
+                    .WithMany(m => m.SendMessages)
+                    .HasForeignKey(m => m.SenderId);
+
+                b.HasOne(m => m.Recipient)
+                    .WithMany(m => m.ReceiveMessages)
+                    .HasForeignKey(m => m.RecipientId);
             });
 
             base.OnModelCreating(builder);

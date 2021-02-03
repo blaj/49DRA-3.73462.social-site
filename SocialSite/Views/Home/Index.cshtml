@@ -167,27 +167,132 @@
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">
-                    Some quick example text to build on the card title and make up the bulk of the
-                    card's content.
-                </p>
-                <a href="#" class="card-link">Card link</a>
-                <a href="#" class="card-link">Another link</a>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">
-                    Some quick example text to build on the card title and make up the bulk of the
-                    card's content.
-                </p>
-                <a href="#" class="card-link">Card link</a>
-                <a href="#" class="card-link">Another link</a>
+                <h5 class="card-title">Aktywni znajomi</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Poniżej znajduje się lista aktywnych znajomych</h6>
+                <ul class="list-group" id="friendContainer">
+                    @foreach (var activeFriend in Model.ActiveFriends)
+                    {
+                        <li class="list-group-item">
+                            <a href="#" class="friend" data-id="@activeFriend.Id" data-name="@activeFriend.FirstName @activeFriend.LastName">
+                                @activeFriend.FirstName @activeFriend.LastName
+
+                                @if (activeFriend.ActivityType.ToString().Equals("ONLINE"))
+                                {
+                                    <span class="badge badge-success">OnLine</span>
+                                }
+
+                                @if (activeFriend.ActivityType.ToString().Equals("AWAY"))
+                                {
+                                    <span class="badge badge-warning">Zaraz wracam</span>
+                                }
+
+                                @if (activeFriend.ActivityType.ToString().Equals("OFFLINE"))
+                                {
+                                    <span class="badge badge-secondary">OffLine</span>
+                                }
+                            </a>
+                        </li>
+                    }
+                </ul>
             </div>
         </div>
     </div>
 </div>
+
+<div class="fixed-bottom">
+    <div class="d-none" id="messageContainer">
+        <div class="row">
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-header">
+                        <span id="messageName"></span>
+
+                        <a href="#" id="closeMessage">Zamknij</a>
+                    </div>
+
+                    <div class="card-body" id="messages" style="max-height: 200px; overflow-y: scroll;"></div>
+
+                    <div class="card-footer">
+                        <form asp-controller="Message" asp-action="SendMessage" id="messageForm">
+                            <div class="input-group">
+                                <input id="recipientUserId" type="hidden" name="recipientUserId" value="" />
+                                <textarea id="messageContent" name="content" class="form-control custom-control" rows="3" style="resize:none"></textarea>
+                                <button type="submit" id="sendMessageButton" class="input-group-addon btn btn-success">Wyślij</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            setInterval(function () {
+                if ($('#messageContainer').hasClass('d-block')) {
+                    getMessages($('#recipientUserId').val());
+                }
+            }, 5000);
+
+            $(document).on('click', '#closeMessage', function () {
+                const messageContainer = $('#messageContainer');
+
+                messageContainer.addClass('d-none')
+                messageContainer.removeClass('d-block');
+            });
+
+            $(document).on('click', '#sendMessageButton', function (e) {
+                e.preventDefault();
+
+                $.post('/Message/SendMessage', $('#messageForm').serialize(), function (response) {
+                    $('#messageContent').empty();
+                    setTimeout(function () { getMessages($('#recipientUserId').val()); }, 1000);
+                });
+            });
+
+            $('#friendContainer').on('click', '.friend', function () {
+                const friendId = $(this).data('id');
+                const friendName = $(this).data('name');
+
+                const messageContainer = $('#messageContainer');
+                const messageName = $('#messageName');
+
+                messageContainer.removeClass('d-none')
+                messageContainer.addClass('d-block');
+
+                messageName.empty();
+                messageName.text(friendName);
+
+                $('#recipientUserId').val(friendId);
+                $('#messageContent').val('');
+
+                getMessages(friendId);
+            });
+
+            function getMessages(friendId) {
+                const messages = $('#messages');
+                messages.empty();
+
+                $.getJSON('/Message/GetMessages/' + friendId, function (messagePayload) {
+                    $(messagePayload).each(function (i, item) {
+                        const content = ''
+                            + '<div class="card mb-2">'
+                            + ' <div class="card-body">'
+                            + '   <h6 class="card-title">'
+                            +       item.userName
+                            + '   </h6>'
+                            + '   <p class="card-text">'
+                            +       item.content
+                            + '   </p>'
+                            + ' </div>'
+                            + '</div>';
+
+                        messages.append(content);
+                    });
+                });
+            };
+        });
+    </script>
+}

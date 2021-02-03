@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SocialSite.Areas.Identity.Data;
 using SocialSite.Data;
+using SocialSite.Filters;
 using SocialSite.Repository;
 using SocialSite.Service;
 
@@ -29,6 +30,8 @@ namespace SocialSite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<BeforeAnyActionFilter>();
+            
             services.AddControllersWithViews();
             services.AddRazorPages();
 
@@ -58,6 +61,9 @@ namespace SocialSite
             services.AddScoped<ICommentRepository, CommentRepository>();
 
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<IMessageService, MessageService>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,6 +1,7 @@
 ﻿using SocialSite.Areas.Identity.Data;
 using SocialSite.Dto.Comment;
 using SocialSite.Dto.Post;
+using SocialSite.Dto.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace SocialSite.Dto.Home
         public List<Models.Comment> Comments { get; set; }
         public ApplicationUser ApplicationUser { get; set;  }
         public CommentCreateRequest CommentCreateRequest { get; set; }
+        public List<ActiveFriendDto> ActiveFriends { get; set; }
     }
 }

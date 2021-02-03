@@ -31,9 +31,14 @@ namespace SocialSite.Areas.Identity.Data
         [Column(TypeName = "date")]
         public DateTime DayOfBirth { get; set; }
 
+        [Column(TypeName = "datetime")]
+        public DateTime LastActivity { get; set; }
+
         public virtual ICollection<Post> Posts { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<ApplicationUserFriend> Friends { get; set; }
         public virtual ICollection<ApplicationUserFriend> FriendOf { get; set; }
+        public virtual ICollection<Message> SendMessages { get; set; }
+        public virtual ICollection<Message> ReceiveMessages { get; set; }
     }
 }

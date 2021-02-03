@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SocialSite.Areas.Identity.Data;
+using SocialSite.Data;
 using SocialSite.Dto.Comment;
 using SocialSite.Dto.Common;
 using SocialSite.Service;
@@ -11,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace SocialSite.Controllers
 {
-    public class CommentController : Controller
+    public class CommentController : AbstractController
     {
-
+        private readonly AuthDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICommentService _commentService;
 
-        public CommentController(UserManager<ApplicationUser> userManager, ICommentService commentService)
+        public CommentController(AuthDbContext context, UserManager<ApplicationUser> userManager, ICommentService commentService) : base(context)
         {
             _userManager = userManager;
             _commentService = commentService;

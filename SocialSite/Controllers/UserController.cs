@@ -14,14 +14,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SocialSite.Controllers
 {
-    public class UserController : Controller
+    public class UserController : AbstractController
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPostRepository _postRepository;
         private readonly IUserService _userService;
         private readonly AuthDbContext _dbContext;
 
-        public UserController(UserManager<ApplicationUser> userManager, IPostRepository postRepository, IUserService userService, AuthDbContext dbContext)
+        public UserController(UserManager<ApplicationUser> userManager, IPostRepository postRepository, IUserService userService, AuthDbContext dbContext) : base(dbContext)
         {
             _userManager = userManager;
             _postRepository = postRepository;

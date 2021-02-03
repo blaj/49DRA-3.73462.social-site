@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialSite.Data;
 
 namespace SocialSite.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210202194641_AddLastActivityToUser")]
+    partial class AddLastActivityToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,33 +269,6 @@ namespace SocialSite.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("SocialSite.Models.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Content")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<string>("RecipientId")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                    b.Property<DateTime>("SendAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("SenderId")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipientId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Messages");
-                });
-
             modelBuilder.Entity("SocialSite.Models.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -396,17 +371,6 @@ namespace SocialSite.Migrations
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("SocialSite.Models.Message", b =>
-                {
-                    b.HasOne("SocialSite.Areas.Identity.Data.ApplicationUser", "Recipient")
-                        .WithMany("ReceiveMessages")
-                        .HasForeignKey("RecipientId");
-
-                    b.HasOne("SocialSite.Areas.Identity.Data.ApplicationUser", "Sender")
-                        .WithMany("SendMessages")
-                        .HasForeignKey("SenderId");
                 });
 
             modelBuilder.Entity("SocialSite.Models.Post", b =>

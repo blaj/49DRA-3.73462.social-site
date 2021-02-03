@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SocialSite.Dto.User;
 
 namespace SocialSite.Service
 {
@@ -40,6 +41,55 @@ namespace SocialSite.Service
             {
                 return false;
             }
+        }
+
+        public ICollection<ActiveFriendDto> GetActiveFriends(ApplicationUser user)
+        {
+            var userFromDb = _dbContext.ApplicationUsers.Where(u => u.Id == user.Id).Include(u => u.Friends).FirstOrDefault();
+            var friends = userFromDb.Friends.Where(f => f.ApplicationUserId == user.Id).ToList();
+            var friends2 = userFromDb.FriendOf.Where(f => f.FriendId == user.Id).ToList();
+
+            var activeFriendsDto = new List<ActiveFriendDto>();
+
+            friends.ForEach(friend =>
+            {
+                var diffTime = DateTime.Now - friend.Friend.LastActivity;
+                var activityType = ActivityType.OFFLINE;
+
+                if (diffTime.TotalMinutes < 1)
+                {
+                    activityType = ActivityType.ONLINE;
+                } 
+                else if (diffTime.TotalMinutes >= 1 && diffTime.TotalMinutes < 5)
+                {
+                    activityType = ActivityType.AWAY;
+                }
+
+                var activeFriend = new ActiveFriendDto { Id = friend.FriendId, FirstName = friend.Friend.FirstName, LastName = friend.Friend.LastName, ActivityType = activityType };
+
+                activeFriendsDto.Add(activeFriend);
+            });
+
+            friends2.ForEach(friend =>
+            {
+                var diffTime = DateTime.Now - friend.ApplicationUser.LastActivity;
+                var activityType = ActivityType.OFFLINE;
+
+                if (diffTime.TotalMinutes < 1)
+                {
+                    activityType = ActivityType.ONLINE;
+                }
+                else if (diffTime.TotalMinutes >= 1 && diffTime.TotalMinutes < 5)
+                {
+                    activityType = ActivityType.AWAY;
+                }
+
+                var activeFriend = new ActiveFriendDto { Id = friend.ApplicationUserId, FirstName = friend.ApplicationUser.FirstName, LastName = friend.ApplicationUser.LastName, ActivityType = activityType };
+
+                activeFriendsDto.Add(activeFriend);
+            });
+
+            return activeFriendsDto;
         }
 
         public bool IsAlreadyFriends(ApplicationUser friend, ApplicationUser user)
@@ -77,5 +127,7 @@ namespace SocialSite.Service
         bool AddFriend(ApplicationUser friend, ApplicationUser user);
         bool RemoveFriend(ApplicationUser friend, ApplicationUser user);
         bool IsAlreadyFriends(ApplicationUser friend, ApplicationUser user);
+
+        ICollection<ActiveFriendDto> GetActiveFriends(ApplicationUser user);
     }
 }

@@ -15,13 +15,13 @@ using SocialSite.Service;
 
 namespace SocialSite.Controllers
 {
-    public class PostController : Controller
+    public class PostController : AbstractController
     {
         private readonly IPostService _postService;
         private readonly AuthDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public PostController(IPostService postService, AuthDbContext context, UserManager<ApplicationUser> userManager)
+        public PostController(IPostService postService, AuthDbContext context, UserManager<ApplicationUser> userManager) : base(context)
         {
             _postService = postService;
             _context = context;
